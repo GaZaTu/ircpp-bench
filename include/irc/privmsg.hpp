@@ -46,11 +46,11 @@ public:
     return _action;
   }
 
-  // std::unordered_map<std::string_view, std::string_view>& tags() {
+  // tags_map& tags() {
   //   return _tags;
   // }
 
-  const std::unordered_map<std::string_view, std::string_view>& tags() const {
+  const tags_map& tags() const {
     return _tags;
   }
 
@@ -78,7 +78,7 @@ private:
   static constexpr char ACTION_END[] = "\x01";
 
   std::variant<std::string_view, std::string> _raw;
-  std::unordered_map<std::string_view, std::string_view> _tags;
+  tags_map _tags;
 
   struct {
     // std::string _channel;

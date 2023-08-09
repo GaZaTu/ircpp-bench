@@ -37,6 +37,14 @@ public:
     return _views._message;
   }
 
+  // tags_map& tags() {
+  //   return _tags;
+  // }
+
+  const tags_map& tags() const {
+    return _tags;
+  }
+
   std::string_view operator[](std::string_view key) const {
     return _tags.at(key);
   }
@@ -58,7 +66,7 @@ private:
   static constexpr int STRING = 1;
 
   std::variant<std::string_view, std::string> _raw;
-  std::unordered_map<std::string_view, std::string_view> _tags;
+  tags_map _tags;
 
   struct {
     std::string_view _channel;
