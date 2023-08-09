@@ -26,7 +26,42 @@ public:
   }
 };
 
-using tags_map = std::unordered_map<std::string_view, std::string_view>;
+// using tags_map = std::unordered_map<std::string_view, std::string_view>;
+
+class tags_map {
+public:
+  tags_map() {
+  }
+
+  size_t size() {
+    return _list.size();
+  }
+
+  void reserve(size_t n) {
+    _list.reserve(n);
+  }
+
+  void emplace(std::string_view key, std::string_view value) {
+    _list.emplace_back(key, value);
+  }
+
+  std::string_view at(std::string_view search) const {
+    for (auto& [key, value] : _list) {
+      if (key == search) {
+        return value;
+      }
+    }
+
+    return {};
+  }
+
+  std::string_view operator[](std::string_view search) const {
+    return at(search);
+  }
+
+private:
+  std::vector<std::pair<std::string_view, std::string_view>> _list;
+};
 
 std::string_view consumeTags(std::string_view raw, tags_map& tags) {
   if (raw[0] != '@') {
