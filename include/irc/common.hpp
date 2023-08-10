@@ -128,7 +128,7 @@ std::string_view consumeTags(std::string_view raw, tags_map& tags) {
   namespace std_simd = std::experimental;
 #endif
 
-  std_simd::fixed_size_simd<char, std_simd::simd_abi::max_fixed_size<char>> vector;
+  std_simd::fixed_size_simd<char, 32> vector;
 
   std::string_view key;
   std::string_view value;
