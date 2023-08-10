@@ -130,6 +130,8 @@ std::string_view consumeTags(std::string_view raw, tags_map& tags) {
 
   std_simd::fixed_size_simd<char, 32> vector;
 
+  bool looking_for_key = true;
+
   std::string_view key;
   std::string_view value;
 
@@ -142,16 +144,23 @@ std::string_view consumeTags(std::string_view raw, tags_map& tags) {
       auto end_idx_in_vector = std_simd::find_first_set(mask);
       mask[end_idx_in_vector] = false;
 
+      auto prev_offset = offset;
       auto end_idx = i + end_idx_in_vector;
       auto view = raw.substr(offset, end_idx - offset);
       offset = end_idx + 1;
 
       switch (raw[end_idx]) {
       case KEY_END:
+        if (!looking_for_key) {
+          offset = prev_offset;
+          break;
+        }
+        looking_for_key = false;
         key = view;
         break;
 
       case VALUE_END:
+        looking_for_key = true;
         tags.emplace(key, view);
         break;
 
