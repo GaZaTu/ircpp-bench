@@ -50,15 +50,15 @@ public:
   tags_map() {
   }
 
-  constexpr size_t size() const noexcept {
+  size_t size() const noexcept {
     return _list.size();
   }
 
-  constexpr void reserve(size_t n) {
+  void reserve(size_t n) {
     _list.reserve(n);
   }
 
-  constexpr void emplace(value_type::first_type key, value_type::second_type value) {
+  void emplace(value_type::first_type key, value_type::second_type value) {
     _list.emplace_back(key, value);
   }
 
@@ -97,11 +97,11 @@ public:
     }
   }
 
-  constexpr list_type::const_iterator begin() const noexcept {
+  list_type::const_iterator begin() const noexcept {
     return _list.begin();
   }
 
-  constexpr list_type::const_iterator end() const noexcept {
+  list_type::const_iterator end() const noexcept {
     return _list.end();
   }
 
