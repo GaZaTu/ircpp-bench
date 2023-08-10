@@ -27,9 +27,9 @@ int main(int argc, char** argv) {
 
   for (int i = 0; i < ITERATIONS; i++) {
     for (const auto& line : data) {
-      irc::parse(line);
-
       // std::cout << line << std::endl;
+
+      irc::parse(line);
 
       // auto privmsg = irc::get<irc::privmsg>(irc::parse(line));
 

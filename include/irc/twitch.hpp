@@ -52,7 +52,7 @@ constexpr const char MSG_PARAM_WAS_GIFTED[] = "msg-param-was-gifted";
 constexpr const char SYSTEM_MSG[] = "system-msg";
 // constexpr const char TMI_SENT_TS[] = "tmi-sent-ts";
 // constexpr const char USER_ID[] = "user-id";
-// constexpr const char USER_TYPE[][] = "user-type";
+// constexpr const char USER_TYPE[] = "user-type";
 
 // ROOMSTATE
 constexpr const char EMOTE_ONLY[] = "emote-only";

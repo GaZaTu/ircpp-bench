@@ -81,9 +81,6 @@ private:
   tags_map _tags;
 
   struct {
-    // std::string _channel;
-    // std::string _sender;
-    // std::string _message;
     std::string_view _channel;
     std::string_view _sender;
     std::string_view _message;
@@ -97,8 +94,6 @@ private:
     // std::cmatch match;
     // std::regex_search(std::begin(data), std::end(data), match, regex::privmsg);
     // bool matched = !match.empty();
-
-    // bool matched = re2::RE2::FullMatch(data, re2_privmsg, &_views._sender, &_views._channel, &_views._message);
 
     auto match = ctre::starts_with<"^:([^!]+)![^@]+@[^ ]+ PRIVMSG #([^ ]+) :">(data);
     bool matched = !!match;
