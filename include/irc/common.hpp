@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <charconv>
 
 #if __has_include("simd")
 #include <simd>
@@ -15,6 +16,19 @@
 #endif
 
 namespace irc {
+// namespace detail {
+// template <auto Start, auto End, auto Inc, class F>
+// constexpr void constexpr_for(F&& f) {
+//   if constexpr (Start < End) {
+//     if (!f(std::integral_constant<decltype(Start), Start>())) {
+//       return;
+//     }
+
+//     constexpr_for<Start + Inc, End, Inc>(f);
+//   }
+// }
+// }
+
 class parsing_error : public std::exception {
 public:
   std::string raw;
@@ -30,22 +44,25 @@ public:
 
 class tags_map {
 public:
+  using value_type = std::pair<std::string_view, std::string_view>;
+  using list_type = std::vector<value_type>;
+
   tags_map() {
   }
 
-  size_t size() const {
+  constexpr size_t size() const noexcept {
     return _list.size();
   }
 
-  void reserve(size_t n) {
+  constexpr void reserve(size_t n) {
     _list.reserve(n);
   }
 
-  void emplace(std::string_view key, std::string_view value) {
+  constexpr void emplace(value_type::first_type key, value_type::second_type value) {
     _list.emplace_back(key, value);
   }
 
-  std::string_view at(std::string_view search) const {
+  value_type::second_type at(value_type::first_type search) const {
     for (auto& [key, value] : _list) {
       if (key == search) {
         return value;
@@ -55,12 +72,41 @@ public:
     return {};
   }
 
-  std::string_view operator[](std::string_view search) const {
+  value_type::second_type operator[](value_type::first_type search) const {
     return at(search);
   }
 
+  template <typename T>
+  T get(std::string_view key) const {
+    auto view = at(key);
+
+    if constexpr (std::is_same_v<T, std::string_view>) {
+      return view;
+    } else if constexpr (std::is_same_v<T, std::string>) {
+      auto result = (std::string)view;
+      // TODO: unescape
+      return result;
+    } else if constexpr (std::is_same_v<T, bool>) {
+      return view != "0";
+    } else if constexpr (std::is_arithmetic_v<T>) {
+      T result = 0;
+      std::from_chars(std::begin(view), std::end(view), result);
+      return result;
+    } else {
+      return {};
+    }
+  }
+
+  constexpr list_type::const_iterator begin() const noexcept {
+    return _list.begin();
+  }
+
+  constexpr list_type::const_iterator end() const noexcept {
+    return _list.end();
+  }
+
 private:
-  std::vector<std::pair<std::string_view, std::string_view>> _list;
+  list_type _list;
 };
 
 std::string_view consumeTags(std::string_view raw, tags_map& tags) {
@@ -73,7 +119,8 @@ std::string_view consumeTags(std::string_view raw, tags_map& tags) {
     return raw;
   }
 
-  tags.reserve(20);
+  static int REQUIRED_CAPACITY = 16;
+  tags.reserve(REQUIRED_CAPACITY);
 
 #if __has_include("simd")
   namespace std_simd = std;
@@ -81,7 +128,7 @@ std::string_view consumeTags(std::string_view raw, tags_map& tags) {
   namespace std_simd = std::experimental;
 #endif
 
-  std_simd::native_simd<char> vector;
+  std_simd::fixed_size_simd<char, std_simd::simd_abi::max_fixed_size<char>> vector;
 
   std::string_view key;
   std::string_view value;
@@ -110,12 +157,16 @@ std::string_view consumeTags(std::string_view raw, tags_map& tags) {
 
       case TAGS_END:
         tags.emplace(key, view);
-        goto consume_tags_end;
+        goto consume_tags_loop_exit;
       }
     }
   }
+consume_tags_loop_exit:
 
-consume_tags_end:
+  if (REQUIRED_CAPACITY < tags.size()) {
+    REQUIRED_CAPACITY = tags.size();
+  }
+
   return raw.substr(offset);
 }
 
