@@ -40,38 +40,23 @@ template <typename T>
 constexpr size_t index_v = detail::variant_get_index<T, message>::value;
 
 template <typename T>
-constexpr T& get(message& m) {
+constexpr inline T& get(message& m) {
   return std::get<index_v<T>>(m);
 }
 
 template <typename T>
-constexpr const T& get(const message& m) {
+constexpr inline const T& get(const message& m) {
   return std::get<index_v<T>>(m);
 }
 
 template <typename T>
-constexpr T* get_if(message& m) {
+constexpr inline T* get_if(message& m) {
   return std::get_if<index_v<T>>(&m);
 }
 
 template <typename T>
-constexpr const T* get_if(const message& m) {
+constexpr inline const T* get_if(const message& m) {
   return std::get_if<index_v<T>>(&m);
-}
-
-inline std::string_view stringify(const message& m) {
-  std::string_view result;
-
-  detail::constexpr_for<(size_t)0, std::variant_size_v<message>, (size_t)1>([&result, &m](auto i) {
-    if (m.index() != i) {
-      return true;
-    }
-
-    result = (std::string_view)std::get<i>(m);
-    return false;
-  });
-
-  return result;
 }
 
 namespace detail {
@@ -109,4 +94,6 @@ inline message parse(std::string& raw) {
 inline message parse(std::string_view raw) {
   return detail::parse<std::string_view>(raw);
 }
+
+std::string_view stringify(const message& m);
 } // namespace irc

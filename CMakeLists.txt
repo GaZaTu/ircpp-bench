@@ -24,6 +24,17 @@ include_directories(
 
 set(SRC_FILES
   src/main.cpp
+  src/irc/clearchat.cpp
+  src/irc/common.cpp
+  src/irc/join.cpp
+  src/irc/out.cpp
+  src/irc/parse.cpp
+  src/irc/ping.cpp
+  src/irc/privmsg.cpp
+  src/irc/reconnect.cpp
+  src/irc/roomstate.cpp
+  src/irc/unknown.cpp
+  src/irc/usernotice.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
